@@ -11,6 +11,7 @@ interface DasboardProps extends RouteComponentProps {}
 const Index: React.FC<DasboardProps> = () => {
   const context = useContext(GlobalContext)
   const [data, setData] = useState<Task[]>([])
+  // console.log(context && context.user)
   const [
     markComplete,
     { data: markData, error: markError, loading: markLoading },
@@ -50,13 +51,13 @@ const Index: React.FC<DasboardProps> = () => {
     console.log(docId)
     markComplete({ variables: { docId } })
   }
-  console.log(queryError, mutationError, markError)
+  // console.log(queryError, mutationError, markError)
   return (
     <>
       <Header text="Logout" />
       <div className={classes.content}>
         <p className={classes.welcome}>Welcome</p>
-        <p className={classes.name}>{context.user?.user_metadata.full_name}</p>
+        {/* <p className={classes.name}>{context.user?.user_metadata.full_name}</p> */}
         {queryLoading || mutationLoading || markLoading ? (
           <p style={{ marginTop: "20vh" }}>Loading . . . </p>
         ) : (

@@ -1,28 +1,23 @@
-import { AppSyncResolverEvent, Context } from "aws-lambda";
-import { DynamoDB } from "aws-sdk";
+import { AppSyncResolverEvent, Context } from "aws-lambda"
+import { DynamoDB } from "aws-sdk"
 import {
   AddTodoParameters,
   MarkAsCompletedParameters,
   Todo,
-} from "../../Interfaces";
+} from "../../Interfaces"
 // import { v4 } from "uuid";
 class Todos {
-  documentClient: DynamoDB.DocumentClient;
-  tableName: string;
+  documentClient: DynamoDB.DocumentClient
+  tableName: string
   constructor(tableName: string) {
-    this.documentClient = new DynamoDB.DocumentClient();
-    this.tableName = tableName;
+    this.documentClient = new DynamoDB.DocumentClient()
+    this.tableName = tableName
   }
   async addTodos(
     event: AppSyncResolverEvent<AddTodoParameters>,
     context: Context
   ) {
-    // const documentAttributes: Todo = {
-    //   userId: "123456",
-    //   docId: context.awsRequestId,
-    //   isCompleted: false,
-    //   title: event.arguments.title,
-    // };
+    console.log(event, context)
 
     const res = await this.documentClient
       .update({
@@ -37,20 +32,21 @@ class Todos {
         },
         ReturnValues: "ALL_NEW",
       })
-      .promise();
+      .promise()
 
-    return res;
+    return res
   }
   async getAllTodos(event: AppSyncResolverEvent<any>, context: Context) {
+    console.log(context.clientContext, "__--__--__clientContext")
     const res = await this.documentClient
       .scan({
         TableName: this.tableName,
         FilterExpression: "userId = :userId",
         ExpressionAttributeValues: { ":userId": "123456" },
       })
-      .promise();
+      .promise()
     //replace hard coded userId with context Id later
-    return res;
+    return res
   }
   async markTodoAsCompleted(
     event: AppSyncResolverEvent<MarkAsCompletedParameters>,
@@ -66,9 +62,9 @@ class Todos {
         },
         ReturnValues: "ALL_NEW",
       })
-      .promise();
-    return res;
+      .promise()
+    return res
   }
 }
 
-export default Todos;
+export default Todos

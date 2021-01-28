@@ -1,44 +1,51 @@
 import React, { useEffect, useState } from "react"
-import netlifyIdentity from "netlify-identity-widget"
-import { NetlifyWidget } from "./Interfaces"
-import { navigate } from "gatsby"
+
 import { ApolloProvider } from "@apollo/client"
 import { createApolloClientWithTokenContext } from "./Apollo/client"
+import Amplify, { Auth } from "aws-amplify"
+import awsmobile from "./aws-exports"
+import { AuthState, onAuthUIStateChange } from "@aws-amplify/ui-components"
 
 export const GlobalContext = React.createContext<GlobalContextValues | null>(
   null
 )
-declare global {
-  interface Window {
-    netlifyIdentity: NetlifyWidget
-  }
-}
 interface GlobalContextValues {
-  user: netlifyIdentity.User | null
+  user: any | null
 }
 
 const Index = ({ children }) => {
-  const [user, setUser] = useState<netlifyIdentity.User>(null)
+  Amplify.configure(awsmobile)
+  const [user, setUser] = useState<any>(null)
   useEffect(() => {
-    window.netlifyIdentity = netlifyIdentity
-    netlifyIdentity.init()
-    setUser(window.netlifyIdentity.currentUser())
-    window.netlifyIdentity.on("logout", () => {
-      window.netlifyIdentity.close()
-      setUser(null)
-      navigate("/")
-    })
-    window.netlifyIdentity.on("login", () => {
-      window.netlifyIdentity.close()
-      setUser(window.netlifyIdentity.currentUser())
-      navigate("/app")
+    if (AuthState.SignedIn) {
+      Auth.currentAuthenticatedUser()
+        .then(userData => {
+          const token = userData.signInUserSession.accessToken.jwtToken
+          setUser({ ...userData, token })
+        })
+        .catch(err => {
+          setUser(null)
+          console.log(err)
+        })
+    }
+    onAuthUIStateChange((nextAuthState, authData) => {
+      if (nextAuthState === AuthState.SignedIn) {
+        console.log(authData, "from state shandged")
+        const token = (authData as any).signInUserSession.accessToken.jwtToken
+        setUser({ ...authData, token })
+        setUser(authData)
+      } else if (nextAuthState === AuthState.SignOut) {
+        setUser(null)
+      } else {
+        setUser(null)
+      }
     })
   }, [])
   return (
     <>
       <GlobalContext.Provider value={{ user: user }}>
         <ApolloProvider
-          client={createApolloClientWithTokenContext(user?.token?.access_token)}
+          client={createApolloClientWithTokenContext(user?.token)}
         >
           {children}
         </ApolloProvider>

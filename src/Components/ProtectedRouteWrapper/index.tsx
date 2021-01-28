@@ -8,7 +8,7 @@ interface ProtectedRouteProps extends RouteComponentProps {
 const Index: React.FC<ProtectedRouteProps> = ({ component }) => {
   const context = useContext(GlobalContext)
   if (!context.user) {
-    window.netlifyIdentity && navigate("/")
+    navigate("/")
   }
   return <>{component}</>
 }
