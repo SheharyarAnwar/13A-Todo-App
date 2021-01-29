@@ -17,8 +17,7 @@ class Todos {
     event: AppSyncResolverEvent<AddTodoParameters>,
     context: Context
   ) {
-    console.log(event, context)
-
+    console.log(event.identity?.username, "Now OKi")
     const res = await this.documentClient
       .update({
         TableName: this.tableName,
@@ -26,7 +25,7 @@ class Todos {
         UpdateExpression:
           "SET userId = :userId, isCompleted = :isCompleted, title = :title",
         ExpressionAttributeValues: {
-          ":userId": "123123",
+          ":userId": event?.identity?.username,
           ":isCompleted": false,
           ":title": event.arguments.title,
         },
@@ -37,12 +36,12 @@ class Todos {
     return res
   }
   async getAllTodos(event: AppSyncResolverEvent<any>, context: Context) {
-    console.log(context.clientContext, "__--__--__clientContext")
+    console.log(event.identity?.username, "Now OKi get all")
     const res = await this.documentClient
       .scan({
         TableName: this.tableName,
         FilterExpression: "userId = :userId",
-        ExpressionAttributeValues: { ":userId": "123456" },
+        ExpressionAttributeValues: { ":userId": event.identity?.username },
       })
       .promise()
     //replace hard coded userId with context Id later

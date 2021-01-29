@@ -6,7 +6,7 @@ export async function handler(
   event: AppSyncResolverEvent<any>,
   context: Context
 ): Promise<any> {
-  console.log(event.request.headers.authorization, event, "+++clientContext")
+  console.log(event, context, "Salvation")
   const todo = new Todos(process.env.TABLE || "")
   const fieldName: TodosFieldName = event.info.fieldName as TodosFieldName
   switch (fieldName) {

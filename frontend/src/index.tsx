@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 
 import { ApolloProvider } from "@apollo/client"
-import { createApolloClientWithTokenContext } from "./Apollo/client"
+import { client } from "./Apollo/client"
 import Amplify, { Auth } from "aws-amplify"
 import awsmobile from "./aws-exports"
 import { AuthState, onAuthUIStateChange } from "@aws-amplify/ui-components"
@@ -30,7 +30,7 @@ const Index = ({ children }) => {
     }
     onAuthUIStateChange((nextAuthState, authData) => {
       if (nextAuthState === AuthState.SignedIn) {
-        console.log(authData, "from state shandged")
+        // console.log(authData, "from state shandged")
         const token = (authData as any).signInUserSession.accessToken.jwtToken
         setUser({ ...authData, token })
         setUser(authData)
@@ -44,11 +44,7 @@ const Index = ({ children }) => {
   return (
     <>
       <GlobalContext.Provider value={{ user: user }}>
-        <ApolloProvider
-          client={createApolloClientWithTokenContext(user?.token)}
-        >
-          {children}
-        </ApolloProvider>
+        <ApolloProvider client={client}>{children}</ApolloProvider>
       </GlobalContext.Provider>
     </>
   )
