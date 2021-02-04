@@ -17,7 +17,7 @@ export const getClient = () => {
     jwtToken: async () =>
       (await Auth.currentSession()).getIdToken().getJwtToken(),
   }
-  console.log(auth)
+  // console.log(auth)
   const link = ApolloLink.from([
     createAuthLink({ url, region, auth }),
     createHttpLink({ uri: url }),

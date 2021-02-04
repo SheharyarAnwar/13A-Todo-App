@@ -30,7 +30,7 @@ const Index = ({ children }) => {
     }
     onAuthUIStateChange((nextAuthState, authData) => {
       if (nextAuthState === AuthState.SignedIn) {
-        console.log(authData, "from state shandged")
+        // console.log(authData, "from state shandged")
         const token = (authData as any).signInUserSession.accessToken.jwtToken
         setUser({ ...authData, token })
         setUser(authData)
